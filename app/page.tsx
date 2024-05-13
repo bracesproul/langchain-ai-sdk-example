@@ -9,8 +9,8 @@ export default function Page() {
   });
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="mx-auto w-full max-w-md py-24 flex flex-col stretch">
+    <div className="mx-auto w-full max-w-md py-12 flex flex-col stretch">
+      <div className="flex flex-col pb-3">
         {messages.map((m) => (
           <div key={m.id}>
             {m.role === "user" ? "User: " : "AI: "}
@@ -18,7 +18,7 @@ export default function Page() {
           </div>
         ))}
       </div>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-[250px]">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <input
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
           placeholder="Tell me a joke about..."
