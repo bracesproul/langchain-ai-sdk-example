@@ -16,7 +16,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="mx-auto w-full max-w-2xl py-4 flex flex-row gap-2">
+          <a href="/stream">Streaming example</a>
+          <a href="/tools">Tool calling example</a>
+          <a href="/agent">Agent streaming example</a>
+        </div>
+        {children}
+      </body>
     </html>
   );
 }

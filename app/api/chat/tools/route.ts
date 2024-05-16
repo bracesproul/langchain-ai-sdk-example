@@ -34,24 +34,28 @@ function mapObjectToVercel<T>(toolOutput: T): Message {
     id: uuivv4(),
     content: "",
     role: "tool",
-    tool_calls: [{
-      id: uuivv4(),
-      type: "function",
-      function: {
-        name: "profanity",
-        arguments: JSON.stringify(toolOutput, null, 2)
-      }
-    }]
-  }
+    tool_calls: [
+      {
+        id: uuivv4(),
+        type: "function",
+        function: {
+          name: "profanity",
+          arguments: JSON.stringify(toolOutput, null, 2),
+        },
+      },
+    ],
+  };
 }
 
-function asyncGeneratorToReadableStream<T>(generator: IterableReadableStream<T>): ReadableStream<Uint8Array> {
+function asyncGeneratorToReadableStream<T>(
+  generator: IterableReadableStream<T>,
+): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   return new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
         for await (const item of generator) {
-          const stringifiedMsg = JSON.stringify(mapObjectToVercel(item))
+          const stringifiedMsg = JSON.stringify(mapObjectToVercel(item));
           controller.enqueue(encoder.encode(stringifiedMsg));
         }
         controller.close();
@@ -63,8 +67,10 @@ function asyncGeneratorToReadableStream<T>(generator: IterableReadableStream<T>)
 }
 
 const schema = z.object({
-  contains_profanity: z.boolean().describe("Whether the message contains profanity"),
-})
+  contains_profanity: z
+    .boolean()
+    .describe("Whether the message contains profanity"),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -88,7 +94,7 @@ export async function POST(req: NextRequest) {
       temperature: 0,
     }).withStructuredOutput(schema, {
       name: "profanity",
-    })
+    });
     // Use LCEL to create a Runnable chain, piping the prompt -> model
     const chain = prompt.pipe(model);
 
@@ -100,7 +106,9 @@ export async function POST(req: NextRequest) {
 
     // Send the stream back using the StreamingTextResponse class, and LangChainAdapter
     // which converts the stream to a format which the AI SDK can understand.
-    return new StreamingTextResponse(asyncGeneratorToReadableStream<z.infer<typeof schema>>(stream));
+    return new StreamingTextResponse(
+      asyncGeneratorToReadableStream<z.infer<typeof schema>>(stream),
+    );
   } catch (e) {
     console.error("Error", e);
   }

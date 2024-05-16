@@ -1,22 +1,27 @@
 import { NextRequest } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
-import { LangChainAdapter, Message, StreamData, StreamObjectResult, StreamingTextResponse } from "ai";
+import {
+  LangChainAdapter,
+  Message,
+  StreamData,
+  StreamObjectResult,
+  StreamingTextResponse,
+} from "ai";
 import {
   AIMessage,
   BaseMessage,
   HumanMessage,
   SystemMessage,
 } from "@langchain/core/messages";
-import {
-  ChatPromptTemplate,
-} from "@langchain/core/prompts";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import { AgentExecutor, createOpenAIToolsAgent } from "langchain/agents";
 import { pull } from "langchain/hub";
 import { StreamEvent } from "@langchain/core/tracers/log_stream";
 
-
-function asyncGeneratorToReadableStream(generator: AsyncGenerator<Uint8Array>): ReadableStream<Uint8Array> {
+function asyncGeneratorToReadableStream(
+  generator: AsyncGenerator<Uint8Array>,
+): ReadableStream<Uint8Array> {
   return new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
@@ -50,7 +55,9 @@ export async function POST(req: NextRequest) {
     // Define the tools the agent will have access to.
     const tools = [new TavilySearchResults({ maxResults: 1 })];
 
-    const prompt = await pull<ChatPromptTemplate>("hwchase17/openai-tools-agent");
+    const prompt = await pull<ChatPromptTemplate>(
+      "hwchase17/openai-tools-agent",
+    );
 
     const llm = new ChatOpenAI({
       model: "gpt-3.5-turbo-1106",
@@ -67,14 +74,16 @@ export async function POST(req: NextRequest) {
       agent,
       tools,
     });
-    
-    const stream = agentExecutor.streamEvents({
-      input: "what is LangChain?",
-    }, {
-      version: "v1",
-      encoding: "text/event-stream"
-    });
 
+    const stream = agentExecutor.streamEvents(
+      {
+        input: "what is LangChain?",
+      },
+      {
+        version: "v1",
+        encoding: "text/event-stream",
+      },
+    );
 
     return new Response(asyncGeneratorToReadableStream(stream), {
       headers: {
