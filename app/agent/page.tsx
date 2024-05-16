@@ -28,7 +28,6 @@ export default function Page() {
     const { streamData } = await runAgent(input);
     for await (const item of readStreamableValue(streamData)) {
       setData((prev) => [...prev, item]);
-      console.log(item);
     }
     setIsLoading(false);
   }
